@@ -27,6 +27,9 @@ local radiusConst = 10
 local currentDot = 2
 local nextObject,newX,newY
 
+--
+local restartButton
+
 function chancgePage( e)
 --	if e.phase=="ended" then
 		local options =
@@ -40,11 +43,11 @@ function chancgePage( e)
 end
 
 
-function alloudTouch2( ... )
+function alloudTouch2(  )
 	touchable=true
 end
 -----------------------------------------------------------sprites-----------------
-local f1,f2,f3,thumb,metal,star
+local f1,f2,f3,thumb,metal,star,failHand
 
 local finger1 = graphics.newImageSheet( imagePath.. "leftFinger.png", { width=200,height=226,numFrames=3   })
 local finger2 = graphics.newImageSheet( imagePath.."middleFinger.png", { width=200,height=226,numFrames=3   })
@@ -128,6 +131,17 @@ function clearLines(  )
 end
 
 
+function restart(  )
+	failHand.isVisible=false
+	metal.isVisible=false
+	star.isVisible=false
+	handGroup.isVisible=true
+	dotGroup.isVisible=true
+	restartButton.isVisible=false
+
+	return true
+end
+
 function win( )
 	metal.isVisible=true
 	star.isVisible=true
@@ -142,14 +156,11 @@ function rock( )
 	transition.to(metal,{ xScale=1,yScale=1,time=500,onComplete=rock2 }   )
 end
 
-
 function rock2( )
 	transition.to(metal,{ xScale=1.8,yScale=1.8,time=700 ,onComplete=rock3}   )
 end
 
-
 function rock3( )
-
 	transition.to(metal,{ xScale=1,yScale=1,time=800 }   )
 end
 
@@ -158,6 +169,12 @@ function showMessage( txt,color )
 	 message.alpha=0
 	 message.isVisible = false
 	 message.text= txt
+
+	 restartButton.isVisible=true
+	 failHand.isVisible=true
+	 handGroup.isVisible=false
+	 lineGroup.isVisible=false
+
 	 if color == "green" then
 	 	message:setTextColor(0,1,0)
 	else
@@ -184,6 +201,11 @@ function scene:create( event )
 	background.x=_W/2
 	background.y=_H/2
 	background:setFillColor(239/255,248/255,110/255)
+
+	restartButton = display.newImageRect(sceneGroup, imagePath.."palm.png",80,80)
+	restartButton.x=100
+	restartButton.y=100
+	restartButton.isVisible=false
 
 	sceneGroup:insert(handGroup)
 	sceneGroup:insert(dotGroup)
@@ -215,6 +237,11 @@ function scene:create( event )
 	star.y=_H/2
 	star.isVisible=false
 
+	failHand = display.newImageRect(sceneGroup,imagePath.."palm.png",_W/2,_H/2)
+	failHand.x+_W/2
+	failHand.y=_H/2
+	failHand.isVisible=false
+
 	metal = display.newImageRect(sceneGroup, imagePath.."metal.png",_W/4*3 *0.73 ,_W/4*3 )
 	metal.x=_W/2 
 	metal.y=_H/2
@@ -235,7 +262,6 @@ function scene:create( event )
 	message=display.newText(sceneGroup, "FALLASTE!!",_W/4,_H/8*7,400,100,"arial",48  )
 	message.isVisible=false
 	message:setTextColor(1,0,0)
-
 
 end
 
@@ -264,9 +290,6 @@ function scene:show( event )
 		function mainDot:touch( e )
 			if(touch) then
 				local t =e.target
-				
- 
-
 				if(e.phase=="began") then
 					display.getCurrentStage():setFocus( t )
 					self.isFocus = true
@@ -279,16 +302,12 @@ function scene:show( event )
 				elseif (self.isFocus) then
 					if (e.phase=="moved") then
 						
-
 						if(myLine) then
 							myLine.parent:remove(myLine)
 						end
-
-
 						myLine = display.newLine(  newX,newY,e.x,e.y)
 						myLine.strokeWidth = 5
 						myLine:setStrokeColor(180/255,244/255,255/255  )
-			--			print ( "currentDot x= "..  pointsX[currentDot])
 						for i=2,totalCircles,1 do
 							if(e.x>pointsX[i]-radiusConst and e.x<pointsX[i]+radiusConst and  e.y>pointsY[i]-radiusConst and e.y<pointsY[i]+radiusConst  )  then
 								if(dots[i].checked==false) then
@@ -297,13 +316,9 @@ function scene:show( event )
 									print( "the dot number " ..i.." was reached, looking for" .. currentDot   )
 									dots[i].checked=true
 								
-
-								
-
 									if(i==currentDot  ) then
 										transition.cancel("blink")
 										dots[i]:setFillColor(0,1,0)
-
 											local completeLine = display.newLine( lineGroup, newX,newY,dots[currentDot].x,dots[currentDot].y )
 											completeLine:setStrokeColor(1,1,0)
 											completeLine.strokeWidth=4
@@ -312,11 +327,9 @@ function scene:show( event )
 										if(currentDot<totalCircles) then
 											currentDot=currentDot+1
 											print(currentDot .." increased")
-											
 											nextObject=dots[currentDot]
 											blink()
 										else 
-										
 											display.getCurrentStage():setFocus( nil )
 											self.isFocus = false
 											if(myLine) then
@@ -334,7 +347,6 @@ function scene:show( event )
 											f2:play()
 											audio.play(engine)
 										end
-
 
 										if i ==totalCircles then
 											audio.play(engine)
@@ -379,7 +391,8 @@ function scene:show( event )
 				print("not ready to touch") 
 			end
 		end
-
+		restartButton.touch=restart
+		restartButton:addEventListener("touch",restartButton)
 
 		mainDot:addEventListener("touch",mainDot)
 
