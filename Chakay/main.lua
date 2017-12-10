@@ -15,7 +15,7 @@ local function main(  )
 		time = 1000,
 	}
 	--composer.gotoScene( "src.app.scenes.game", options)
-	composer.gotoScene( "src.views.portada", options)
+	composer.gotoScene( "src.views.mano", options)
 	return true
 end
 

@@ -15,13 +15,13 @@ local instrucciones = audio.loadSound("src/sounds/fn9.mp3")
 
 local mainDot
 
-local background,leftPage,rightPage,rightPage2 ,touch, touchable,touchable2,polygon,message
+local background,leftPage,rightPage,rightPage2 ,touch, touchable,touchable2,polygon,winMessage
 local imagePath = "src/images/"
 local lineGroup,handGroup,dotGroup
 --setting circles position and table for holding
 local totalCircles = 8
-local pointsX={_W/2,_W/3, _W/3-90,_W/2-80,_W/3+90, _W/2+45,_W/4*3-60,_W/2+88}
-local pointsY= {_H/8*7,_H/4*3,_H/4 +80,_H/2 +45,  _H/4+60,  _H/2 +45,_H/4+65,_H/4*3 -35}
+local pointsX={_W/2,_W/3, _W/3-90,_W/2-80,_W/3+90, _W/2+45,_W/4*3-60,_W/2+88, _W/2}
+local pointsY= {_H/8*7,_H/4*3,_H/4 +80,_H/2 +45,  _H/4+60,  _H/2 +45,_H/4+65,_H/4*3 -35, _H/8*7}
 local dots={}
 local radiusConst = 10
 local currentDot = 2
@@ -137,6 +137,7 @@ function restart(  )
 	star.isVisible=false
 	handGroup.isVisible=true
 	dotGroup.isVisible=true
+	lineGroup.isVisible=true
 	restartButton.isVisible=false
 
 	return true
@@ -165,10 +166,10 @@ function rock3( )
 end
 
 
-function showMessage( txt,color )
-	 message.alpha=0
-	 message.isVisible = false
-	 message.text= txt
+function showwinMessage( txt,color )
+	 winMessage.alpha=0
+	 winMessage.isVisible = false
+	 winMessage.text= txt
 
 	 restartButton.isVisible=true
 	 failHand.isVisible=true
@@ -176,16 +177,16 @@ function showMessage( txt,color )
 	 lineGroup.isVisible=false
 
 	 if color == "green" then
-	 	message:setTextColor(0,1,0)
+	 	winMessage:setTextColor(0,1,0)
 	else
-		message:setTextColor(1,0,0)
+		winMessage:setTextColor(1,0,0)
 	end
 	 touch=false
-	 transition.to(message,{ time = 2000 ,alpha=0.6 ,onComplete=hideMessage})
+	 transition.to(winMessage,{ time = 2000 ,alpha=0.6 ,onComplete=hidewinMessage})
 end
 
-function hideMessage(  )
-	message.isVisible=false
+function hidewinMessage(  )
+	winMessage.isVisible=false
 	touch =true
 	clearLines()
 end
@@ -202,7 +203,7 @@ function scene:create( event )
 	background.y=_H/2
 	background:setFillColor(239/255,248/255,110/255)
 
-	restartButton = display.newImageRect(sceneGroup, imagePath.."palm.png",80,80)
+	restartButton = display.newImageRect(sceneGroup, imagePath.."redo.png",80,80)
 	restartButton.x=100
 	restartButton.y=100
 	restartButton.isVisible=false
@@ -237,8 +238,8 @@ function scene:create( event )
 	star.y=_H/2
 	star.isVisible=false
 
-	failHand = display.newImageRect(sceneGroup,imagePath.."palm.png",_W/2,_H/2)
-	failHand.x+_W/2
+	failHand = display.newImageRect(sceneGroup,imagePath.."brokenHand.png",_W/2,_H/2)
+	failHand.x=_W/2
 	failHand.y=_H/2
 	failHand.isVisible=false
 
@@ -259,9 +260,14 @@ function scene:create( event )
 		dots[i].checked=false
 	end
 
-	message=display.newText(sceneGroup, "FALLASTE!!",_W/4,_H/8*7,400,100,"arial",48  )
-	message.isVisible=false
-	message:setTextColor(1,0,0)
+	winMessage=display.newText(sceneGroup, "FALLASTE!!",_W/4,_H/8*7,400,100,"arial",48  )
+	winMessage.isVisible=false
+	winMessage:setTextColor(1,0,0)
+
+	loseMessage = display.newImageRect(sceneGroup,imagePath.."fail.png",300,100)
+
+
+
 
 end
 
@@ -335,7 +341,7 @@ function scene:show( event )
 											if(myLine) then
 												myLine.parent:remove(myLine)
 											end
-											showMessage("GANASTE", "green" )
+											showwinMessage("GANASTE", "green" )
 										end
 
 										if i==4 then
@@ -363,7 +369,7 @@ function scene:show( event )
 										if(myLine) then
 											myLine.parent:remove(myLine)
 										end
-										showMessage("FALLASTE","red")
+										showwinMessage("FALLASTE","red")
 
 									end
 							
@@ -378,7 +384,7 @@ function scene:show( event )
 					elseif(e.phase=="ended" or e.phase =="cancelled") then
 						display.getCurrentStage():setFocus( nil )
 						self.isFocus = false
-						showMessage("FALLASTE","red")
+						showwinMessage("FALLASTE","red")
 						transition.cancel("blink")
 						if(myLine) then
 							myLine.parent:remove(myLine)
