@@ -27,8 +27,38 @@ function alloudTouch(  )
 	transition.to(rightPage, {alpha=1,time=2000 ,onComplete=moveFrame2 })
 end
 
-function alloudTouch2( ... )
+
+function fadeThunder( ... )
+	rightPage2.isVisible=false
+	transition.to(rightPage2,{time=100,onComplete =thunder })
+end
+
+function fadeThunder1( ... )
+	rightPage2.isVisible=false
+	transition.to(rightPage2,{time=100,onComplete =thunder1 })
+end
+
+function fadeThunder2( ... )
+	rightPage2.isVisible=false
 	touchable2=true
+	transition.to(rightPage2,{time=300 })
+end
+
+function thunder1( ... )
+	rightPage2.isVisible=true
+	transition.to(rightPage2,{time=100,onComplete = fadeThunder2})
+end
+
+
+function thunder( ... )
+	rightPage2.isVisible=true
+	transition.to(rightPage2,{time=100,onComplete = fadeThunder1})
+end
+
+function alloudTouch2( ... )
+	--touchable2=true
+	rightPage2.isVisible=true
+	transition.to(rightPage2,{time=100,onComplete=fadeThunder})
 end
 
 function alloudTouch3( ... )
@@ -51,23 +81,23 @@ function moveFrame1()
 		audio.play(audio1)
 		touch1 = false
 		print("start")
-		transition.to(leftPage,{xScale=1,yScale=1,x=_W/2,y=_H/2,time=4200,onComplete=alloudTouch2 } )
+		transition.to(leftPage,{xScale=1,yScale=1,x=_W/2,y=_H/2,time=4000,onComplete=alloudTouch2 } )
 	end
 end
 
-function moveFrame2( ... )
-	if touchable then
-		touchable=false
-		transition.to(rightPage,{y=0,time=3000,onComplete=moveFrame2a})
-	--	music:stop("audio1")
-		audio.play(audio2)
-	end
-end
+-- function moveFrame2( ... )
+-- 	if touchable then
+-- 		touchable=false
+-- 		transition.to(rightPage,{y=0,time=3000,onComplete=moveFrame2a})
+-- 	--	music:stop("audio1")
+-- 		audio.play(audio2)
+-- 	end
+-- end
 
-function moveFrame2a(  )
-	transition.to(rightPage,{xScale=1,yScale=1,y=_H/4+60,time=3000,onComplete=alloudTouch3 })
+-- function moveFrame2a(  )
+-- 	transition.to(rightPage,{xScale=1,yScale=1,y=_H/4+60,time=3000,onComplete=alloudTouch3 })
 
-end
+-- end
 
 
 
@@ -78,10 +108,10 @@ function changePage(  )
 		local options =
 		{
 			effect = "fade", --"zoomOutInFade"
-			time = 1000,
+			time = 100,
 		}
 		touchable2=false
-		composer.gotoScene( "src.views.menu", options)
+		composer.gotoScene( "src.views.page2", options)
 		return true
 	end
 
@@ -96,7 +126,7 @@ function scene:create( event )
 	rightPage.x=_W/4*3
 
 
-	leftPage = display.newImageRect(sceneGroup,"src/images/page1.png",_W,_H)
+	leftPage = display.newImageRect(sceneGroup,"src/images/3castillo.jpg",_W,_H)
 	
 
 
@@ -105,9 +135,9 @@ function scene:create( event )
 --	blackPanelRight:setFillColor(0)
 
 
-	rightPage2 = display.newImageRect(sceneGroup,"src/images/2b.png",_W/2 -20,_H/8*2)
-	rightPage2.x=_W/4*3
-	rightPage2.y=_H/4*3 +60
+	rightPage2 = display.newImageRect(sceneGroup,"src/images/3castillorayo.jpg",_W,_H)
+	rightPage2.x=_W/2
+	rightPage2.y=_H/2
 
 	-- polygon = display.newPolygon(sceneGroup,_W/4*3,_H/4*3 +50,{ 0,100,0,-_H/8-50,_W/2 , -_H/8 -140,_W/2,100 }  )
 	-- polygon:setFillColor(0)

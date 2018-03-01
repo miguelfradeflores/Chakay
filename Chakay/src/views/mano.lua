@@ -19,7 +19,7 @@ local background,leftPage,rightPage,rightPage2 ,touch, touchable,touchable2,poly
 local imagePath = "src/images/"
 local lineGroup,handGroup,dotGroup
 --setting circles position and table for holding
-local totalCircles = 8
+local totalCircles = 9
 local pointsX={_W/2,_W/3, _W/3-90,_W/2-80,_W/3+90, _W/2+45,_W/4*3-60,_W/2+88, _W/2}
 local pointsY= {_H/8*7,_H/4*3,_H/4 +80,_H/2 +45,  _H/4+60,  _H/2 +45,_H/4+65,_H/4*3 -35, _H/8*7}
 local dots={}
@@ -127,9 +127,11 @@ function clearLines(  )
 		dots[i].alpha=0.4
 		dots[i]:setFillColor(0,0,1)
 	end
-
+	dots[totalCircles].checked=true
 end
-
+function victory( ... )		
+	showwinMessage("GANASTE", "green" )
+end
 
 function restart(  )
 	failHand.isVisible=false
@@ -139,7 +141,6 @@ function restart(  )
 	dotGroup.isVisible=true
 	lineGroup.isVisible=true
 	restartButton.isVisible=false
-
 	return true
 end
 
@@ -149,37 +150,41 @@ function win( )
 	handGroup.isVisible=false
 	dotGroup.isVisible=false
 	audio.play(riff)
-	transition.to(star,  {rotation=72600,time=5000} )
-	transition.to( metal, { xScale =2,yScale=2,onComplete=rock,time =1000  } )
+	transition.to(star,  {rotation=72600,time=6000} )
+	transition.to( metal, { xScale =2,yScale=2,onComplete=rock,time =1200  } )
 end
 
 function rock( )
-	transition.to(metal,{ xScale=1,yScale=1,time=500,onComplete=rock2 }   )
+	transition.to(metal,{ xScale=1,yScale=1,time=700,onComplete=rock2 }   )
 end
 
 function rock2( )
-	transition.to(metal,{ xScale=1.8,yScale=1.8,time=700 ,onComplete=rock3}   )
+	transition.to(metal,{ xScale=1.8,yScale=1.8,time=900 ,onComplete=rock3}   )
 end
 
 function rock3( )
-	transition.to(metal,{ xScale=1,yScale=1,time=800 }   )
+	transition.to(metal,{ xScale=1,yScale=1,time=1000 }   )
 end
 
 
 function showwinMessage( txt,color )
 	 winMessage.alpha=0
 	 winMessage.isVisible = false
-	 winMessage.text= txt
 
-	 restartButton.isVisible=true
-	 failHand.isVisible=true
+
+	 
 	 handGroup.isVisible=false
 	 lineGroup.isVisible=false
-
+	 dots[totalCircles].checked=true
 	 if color == "green" then
-	 	winMessage:setTextColor(0,1,0)
+--	 	winMessage:setTextColor(0,1,0)
+		winMessage.isVisible=true
 	else
-		winMessage:setTextColor(1,0,0)
+--		winMessage:setTextColor(1,0,0)
+		loseMessage.isVisible=true
+		restartButton.isVisible=true
+		failHand.isVisible=true
+		dotGroup.isVisible=false
 	end
 	 touch=false
 	 transition.to(winMessage,{ time = 2000 ,alpha=0.6 ,onComplete=hidewinMessage})
@@ -187,6 +192,7 @@ end
 
 function hidewinMessage(  )
 	winMessage.isVisible=false
+	loseMessage.isVisible=false
 	touch =true
 	clearLines()
 end
@@ -260,14 +266,13 @@ function scene:create( event )
 		dots[i].checked=false
 	end
 
-	winMessage=display.newText(sceneGroup, "FALLASTE!!",_W/4,_H/8*7,400,100,"arial",48  )
-	winMessage.isVisible=false
-	winMessage:setTextColor(1,0,0)
+	winMessage=display.newImageRect(sceneGroup,imagePath.."win.png",300,100)
+	winMessage.x=_W/2
+	winMessage.y=_H/4
 
 	loseMessage = display.newImageRect(sceneGroup,imagePath.."fail.png",300,100)
-
-
-
+	loseMessage.x = _W/2
+	loseMessage.y = _H/4
 
 end
 
@@ -283,12 +288,14 @@ function scene:show( event )
 	handGroup.x = -150
 	handGroup.xScale=1.4
 	handGroup.yScale=1.4
-
+	loseMessage.isVisible=false
+	winMessage.isVisible=false
 
 	elseif phase == "did" then
 
 	audio.play(instrucciones)
 	touch=true
+	dots[totalCircles].checked=true
 	mainDot = dots[1]
 	mainDot.xScale=1.5
 	mainDot.yScale=1.5
@@ -341,12 +348,13 @@ function scene:show( event )
 											if(myLine) then
 												myLine.parent:remove(myLine)
 											end
-											showwinMessage("GANASTE", "green" )
+
 										end
 
 										if i==4 then
 											f1:play()
 											audio.play(engine)
+											dots[totalCircles].checked=false
 										end
 
 										if i==6 then
@@ -359,6 +367,7 @@ function scene:show( event )
 											f1:play()
 											thumb:play()
 											transition.to(f2,{time=100,onComplete=moveMiddleFinger})
+											transition.to(f2,{time=2000,onComplete=victory})
 										end
 
 									else

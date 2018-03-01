@@ -12,10 +12,10 @@ local function main(  )
 	local options =
 	{
 		effect = "fade", --"zoomOutInFade"
-		time = 1000,
+		time = 500,
 	}
 	--composer.gotoScene( "src.app.scenes.game", options)
-	composer.gotoScene( "src.views.mano", options)
+	composer.gotoScene( "src.views.menu", options)
 	return true
 end
 

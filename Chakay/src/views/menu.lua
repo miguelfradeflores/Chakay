@@ -11,17 +11,20 @@ local _H = display.contentHeight
 
 local picturesButton
 
-local background,leftPage,rightPage ,touchable
+local background
 local imagePath = "src/images/"
 local audioPath = "src/sounds/"
+local storiesGroup
 
-local audio4a = audio.loadSound(audioPath.."fn4a.mp3"  )
-local audio4b = audio.loadSound(audioPath.."fn4b.mp3"  )
-local audio5 = audio.loadSound(audioPath.."fn5.mp3"  )
-local audio6 = audio.loadSound(audioPath.."fn6.mp3"  )
-local audio7 = audio.loadSound(audioPath.."fn7.mp3"  )
-local audio8 = audio.loadSound(audioPath.."fn8.mp3"  )
 
+function playChakay(  )
+	local options =
+		{
+			effect = "fade", --"zoomOutInFade"
+			time = 1000,
+		}
+	composer.gotoScene( "src.views.portada" , options)
+end
 
 function alloudTouch(  )
 	touchable=true
@@ -29,118 +32,42 @@ end
 
 
 
-function hideBackground(  )
-	background.isVisible=false
-	leftPage.alpha=0
-	leftPage.isVisible=true
-	transition.to(leftPage,{time = 1500,alpha=1,onComplete=alloudTouch})
-end
-
-function hidePage(  )
-	leftPage.isVisible=false
-	rightPage.alpha=0
-	rightPage.isVisible=true
-	transition.to(rightPage,{alpha=1,time=1500,onComplete=alloudTouch})
-
-
-end
-
-local fondos = {"2a","2b","page6","page5","page7","page8","page8b","page9" }
-local images={}
-local currentPage=1
-
-function swap(  )
-	images[currentPage].isVisible=false
-	images[currentPage+1].isVisible=true
-	images[currentPage+1].alpha=0.6
-	transition.to(images[currentPage+1],{ alpha=1,time=5500,onComplete=swap2}   )
-	currentPage=currentPage+1
-end
-
-function swap2(  )
-	images[currentPage].isVisible=false
-	images[currentPage+1].isVisible=true
-	images[currentPage+1].alpha=1
-	transition.to(images[7],{ alpha=1,time=8000,onComplete=alloudTouch} )
-	currentPage=currentPage+1
-end
-
-
-function changePage( )
-	print(currentPage)
-	if(currentPage<8 and touchable) then
-		touchable=false
-	images[currentPage].isVisible=false
-	images[currentPage+1].isVisible=true
-	images[currentPage+1].alpha=0
-
-	ATime=1500
-	if(currentPage==1)then
-		audio.play(audio4b)
-		ATime=6000
-	elseif currentPage==2 then
-		audio.play(audio5)
-		ATime=2000
-	elseif currentPage==3 then
-		audio.play(audio6)
-		ATime=5000
-	elseif currentPage==4 then
-		audio.play(audio7)
-		ATime=19000
-
-	elseif currentPage==7 then
-		audio.play(audio8)
-		ATime=7000
-	-- elseif currentPage ==6 then
-	-- 	audio.play(audio8)
-	-- 	ATime=7000
-	end
-
-	if(currentPage~=4) then
-		transition.to(images[currentPage+1],{ alpha=1,time=ATime,onComplete=alloudTouch}   )
-	else
-		transition.to(images[currentPage+1],{ alpha=1,time=5500,onComplete=swap}   )
-	end
-
-	currentPage=currentPage+1
-		if(currentPage==8) then
-			images[8].x=_W/3
-			transition.to(images[8],{x=_W/2,time=5000})	
-		end
-
-
-	elseif(currentPage==8 and touchable) then
-			local options =
-		{
-			effect = "fade", --"zoomOutInFade"
-			time = 1000,
-		}
-		touchable2=false
-		composer.gotoScene( "src.views.mano", options)
-
-	end
-end
-
-function moveFrame2(  )
-	transition.to(images[1],{y=_H/2,xScale=1,yScale=1,time=1300 })
-end
 
 ------------------------SCENES
 function scene:create( event )
 	local sceneGroup = self.view
+	storiesGroup = display.newGroup( )
+	background = display.newRect( sceneGroup, _W/2, _H/2, _W, _H )
+	background:setFillColor( 0 )
+	local logo = display.newImageRect( sceneGroup, imagePath.."logo.png",  _W, 300 )
+	logo.x=_W/2
+	logo.y = 200
 
-	for i=1, 8 do
-	 	local wid=_W
-	 
-		images[i]   = display.newImageRect(sceneGroup,  "src/images/"..fondos[i]..  ".png",wid,_H )
-		images[i].x = _W/2
-		images[i].y = _H/2
-		images[i].isVisible=false
+	local tittle = display.newText( sceneGroup, "Historietas", _W/2, _H/2  ,"arial" ,48 )
 
-		images[i].touch = changePage
-		images[i]:addEventListener("touch",images[i])
 
-	end
+	sceneGroup:insert(  storiesGroup )
+
+	comicOptions = display.newRect( storiesGroup, _W/2 -50,_H/2+150 , _W/4*3, 50  )
+	comicOptions:setFillColor( 0.24,0.31,0.74 )
+
+	comicText = display.newText( storiesGroup, "Chakai", _W/3, comicOptions.y+2 ,_W/2 , 50, "arial" ,36 )
+	comicText:setFillColor(1,0,0)
+
+
+		function storiesGroup:touch( e )
+
+			if e.phase=="began" then
+
+			elseif e.phase == "moved"then
+
+			elseif e.phase == "ended" or e.phase == "cancelled" then
+				playChakay()
+			end
+
+			return true
+			
+		end
 
 
 end
@@ -153,22 +80,11 @@ function scene:show( event )
 	
 	if phase == "will" then
 		-- Called when the scene is still off screen and is about to move on screen
-	-- leftPage.isVisible=false
-	-- rightPage.isVisible=false
-	-- background.isVisible=true
 
-	images[1].isVisible=true
-	images[1].xScale=3
-	images[1].yScale=3
-	images[1].y= _H*1.5
-	currentPage=1
 	elseif phase == "did" then
-		touchable=false
-		audio.play(audio4a)
-		transition.to(images[1],{y=_H/2,time=4500,onComplete=moveFrame2 }   )
-		transition.to(images[1],{time=6000,onComplete=alloudTouch})
 
-	--	background:addEventListener("touch",background)
+
+		storiesGroup:addEventListener( "touch", storiesGroup )
 
 	end	
 
@@ -187,6 +103,8 @@ function scene:hide( event )
 		
 	elseif phase == "did" then
 		-- Called when the scene is now off screen
+
+		storiesGroup:removeEventListener( "touch", storiesGroup )
 	end		
 
 end

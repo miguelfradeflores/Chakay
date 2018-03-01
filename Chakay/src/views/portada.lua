@@ -19,7 +19,7 @@ function chancgePage( e)
 		local options =
 		{
 			effect = "fade", --"zoomOutInFade"
-			time = 1000,
+			time = 500,
 		}
 		composer.gotoScene( "src.views.page1", options)
 --	end
@@ -86,10 +86,12 @@ function scene:show( event )
 	
 	if phase == "will" then
 
+
+		background.touch=chancgePage	
+		background:addEventListener("touch",background)
 	elseif phase == "did" then
 
-		background.touch=chancgePage
-		background:addEventListener("touch",background)
+		
 
 	end	
 
